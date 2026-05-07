@@ -1,29 +1,40 @@
-require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
-// Importamos la conexión
-const pool = require('./config/db.js');
+require('dotenv').config();
+
+// Importamos el hub central de rutas
+const routes = require('./routes'); 
 
 const app = express();
+const PORT = process.env.PORT || 3000;
 
+// Middlewares globales
 app.use(helmet());
 app.use(cors());
 app.use(morgan('dev'));
-app.use(express.json());
+app.use(express.json()); // Crucial: Permite que el servidor entienda los datos que envías (el Body)
+app.use(express.urlencoded({ extended: true })); // Opcional pero recomendado para formularios
 
-// Ruta para testear la DB
-app.get('/test-db', async (req, res) => {
-    try {
-        const result = await pool.query('SELECT NOW()');
-        res.json({ message: "DB conectada correctamente", time: result.rows[0] });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+// Conectamos el hub de rutas bajo el prefijo /api
+app.use('/api', routes);
+
+// Ruta base para confirmar que el servidor vive
+app.get('/', (req, res) => {
+    res.json({ message: "API Concesionario Car Dealership funcionando" });
 });
 
-const PORT = process.env.PORT || 4000;
+// Manejo de 404
+app.use((req, res) => {
+    res.status(404).json({ message: "Ruta no encontrada" });
+});
+
+// Arranque
 app.listen(PORT, () => {
-    console.log(`Servidor corriendo en http://localhost:${PORT}`);
+    console.log('----------------------------------------------------');
+    console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+    const modo = process.env.NODE_ENV === 'production' ? 'PRODUCCIÓN (NEON)' : 'DESARROLLO (LOCAL)';
+    console.log(`📡 Base de datos activa en modo: ${modo}`);
+    console.log('----------------------------------------------------');
 });
