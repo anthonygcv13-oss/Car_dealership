@@ -1,0 +1,354 @@
+{
+  "info": {
+    "name": "Car Dealership API",
+    "_postman_id": "d5f15d37-8b37-4b68-8d95-8c1389609308",
+    "description": "Colección para pruebas de la API de concesionaria. Incluye los endpoints principales y las validaciones actuales.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"secret123\"\n}"
+            },
+            "description": "Iniciar sesión. Validación: email válido, password obligatorio."
+          }
+        },
+        {
+          "name": "Forgot Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/forgot-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "forgot-password"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\"\n}"
+            },
+            "description": "Solicitar recuperación de contraseña."
+          }
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/reset-password/:token",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "reset-password", ":token"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"password\": \"newsecret123\"\n}"
+            },
+            "description": "Restablecer contraseña con token. Reemplazar :token por el token real."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get Users",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["users"]
+            },
+            "description": "Obtener la lista de cuentas de usuario. Requiere autorización."
+          }
+        },
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["users"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"Ana\",\n  \"email\": \"ana@example.com\",\n  \"password\": \"password1\",\n  \"status\": \"active\",\n  \"id_role\": 2\n}"
+            },
+            "description": "Crear usuario. Validaciones: first_name mínimo 2 letras, email válido, password mínimo 6 caracteres, id_role entero positivo."
+          }
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", ":id"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"Ana María\",\n  \"email\": \"ana.maria@example.com\",\n  \"password\": \"newpass123\",\n  \"status\": \"active\",\n  \"id_role\": 2\n}"
+            },
+            "description": "Actualizar usuario. Reemplazar :id con el ID real."
+          }
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/users/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", ":id"]
+            },
+            "description": "Eliminar usuario por ID. Requiere rol de administrador."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Vehicles",
+      "item": [
+        {
+          "name": "Get Vehicles",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/vehicles",
+              "host": ["{{baseUrl}}"],
+              "path": ["vehicles"]
+            },
+            "description": "Listar vehículos. Permite acceso a roles 1, 2 y 3."
+          }
+        },
+        {
+          "name": "Create Vehicle",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/vehicles",
+              "host": ["{{baseUrl}}"],
+              "path": ["vehicles"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"brand_id\": 1,\n  \"model_id\": 1,\n  \"year\": 2025,\n  \"price\": 25000,\n  \"kilometers\": 0\n}"
+            },
+            "description": "Crear vehículo. Requiere rol 1 o 2."
+          }
+        },
+        {
+          "name": "Update Vehicle",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/vehicles/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["vehicles", ":id"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"brand_id\": 1,\n  \"model_id\": 1,\n  \"year\": 2025,\n  \"price\": 24500,\n  \"kilometers\": 10\n}"
+            },
+            "description": "Actualizar vehículo. Requiere rol 1 o 2."
+          }
+        },
+        {
+          "name": "Delete Vehicle",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/vehicles/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["vehicles", ":id"]
+            },
+            "description": "Eliminar vehículo. Solo rol 1."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Vehicle Sales",
+      "item": [
+        {
+          "name": "Get Sales",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/vehicle-sale",
+              "host": ["{{baseUrl}}"],
+              "path": ["vehicle-sale"]
+            },
+            "description": "Listar ventas de vehículos. Permite roles 1, 2 y 3."
+          }
+        },
+        {
+          "name": "Create Sale",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/vehicle-sale",
+              "host": ["{{baseUrl}}"],
+              "path": ["vehicle-sale"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"final_price\": 28000,\n  \"sale_type\": \"Contado\",\n  \"id_user\": 3,\n  \"id_customer\": 5,\n  \"id_vehicle\": 8,\n  \"id_financing_plan\": null\n}"
+            },
+            "description": "Registrar venta. Validación: final_price positivo, sale_type mínimo 3 caracteres, ids positivos. Solo rol 3 puede vender."
+          }
+        },
+        {
+          "name": "Delete Sale",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/vehicle-sale/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["vehicle-sale", ":id"]
+            },
+            "description": "Eliminar una venta por ID. Permite roles 1 y 2."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Quotes",
+      "item": [
+        {
+          "name": "Get Quotes",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/quotes",
+              "host": ["{{baseUrl}}"],
+              "path": ["quotes"]
+            }
+          }
+        },
+        {
+          "name": "Create Quote",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/quotes",
+              "host": ["{{baseUrl}}"],
+              "path": ["quotes"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer_id\": 5,\n  \"vehicle_id\": 2,\n  \"amount\": 30000\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Quote",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/quotes/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["quotes", ":id"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 29000\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Quote",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/quotes/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["quotes", ":id"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

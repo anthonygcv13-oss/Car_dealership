@@ -1,10 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const vehicleController = require('../controllers/vehicle_controllers.js');
+const authorize = require('../middleware/auth_middleware.js');
 
-router.get('/', vehicleController.getVehicles);
-router.post('/', vehicleController.createVehicle);
-router.put('/:id', vehicleController.updateVehicle);
-router.delete('/:id', vehicleController.deleteVehicle);
+// src/routes/vehicle_routes.js
+router.get('/', authorize([1, 2, 3]), vehicleController.getVehicles); // Todos ven
+router.post('/', authorize([1, 2]), vehicleController.createVehicle); // Solo jefes
+router.put('/:id', authorize([1, 2]), vehicleController.updateVehicle);
+router.delete('/:id', authorize([1]), vehicleController.deleteVehicle); // Solo Admin
 
 module.exports = router;

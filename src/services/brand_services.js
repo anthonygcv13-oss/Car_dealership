@@ -1,28 +1,39 @@
-const pool = require('../config/db.js');
+const Brand = require('../models/brand.js');
 
 const getAllBrands = async () => {
-  const result = await pool.query('SELECT * FROM brand');
-  return result.rows;
+    return await Brand.findAll();
 };
 
 const createBrand = async (brandData) => {
-  const { name, description, country_origin, website } = brandData;
-  const query = 'INSERT INTO brand (name, description, country_origin, website) VALUES ($1, $2, $3, $4) RETURNING *';
-  const result = await pool.query(query, [name, description, country_origin, website]);
-  return result.rows[0];
+    const { name, description, country_origin, website } = brandData;
+    return await Brand.create({
+        name,
+        description,
+        country_origin,
+        website
+    });
 };
 
 const updateBrand = async (id, brandData) => {
-  const { name, description, country_origin, website } = brandData;
-  const query = 'UPDATE brand SET name = $1, description = $2, country_origin = $3, website = $4 WHERE id_brand = $5 RETURNING *';
-  const result = await pool.query(query, [name, description, country_origin, website, id]);
-  return result.rows[0];
+    const [updatedRows] = await Brand.update(brandData, {
+        where: { id_brand: id }
+    });
+
+    if (updatedRows === 0) return null;
+
+    return await Brand.findByPk(id);
 };
 
 const deleteBrand = async (id) => {
-  const query = 'DELETE FROM brand WHERE id_brand = $1 RETURNING *';
-  const result = await pool.query(query, [id]);
-  return result.rows[0];
+    const brandToDelete = await Brand.findByPk(id);
+    
+    if (brandToDelete) {
+        await Brand.destroy({
+            where: { id_brand: id }
+        });
+    }
+    
+    return brandToDelete;
 };
 
 module.exports = { getAllBrands, createBrand, updateBrand, deleteBrand };

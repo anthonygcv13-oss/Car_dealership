@@ -1,0 +1,34 @@
+const jwt = require('jsonwebtoken');
+
+const authorize = (rolesPermitidos = []) => {
+    return (req, res, next) => {
+        // 1. Obtener el token del header (Authorization: Bearer TOKEN)
+        const authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            return res.status(401).json({ success: false, message: "No autorizado, falta token" });
+        }
+
+        const token = authHeader.split(' ')[1];
+
+        try {
+            // 2. Verificar el token
+            const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret_key_temporal');
+            req.user = decoded; // Guardamos los datos del usuario en la petición
+
+            // 3. Verificar si el rol está permitido
+            // Si pasamos rolesPermitidos vacíos, solo pedimos que esté logueado
+            if (rolesPermitidos.length > 0 && !rolesPermitidos.includes(req.user.role)) {
+                return res.status(403).json({ 
+                    success: false, 
+                    message: "No tienes permisos suficientes para realizar esta acción" 
+                });
+            }
+
+            next(); // Todo ok, pasamos al controlador
+        } catch (error) {
+            return res.status(401).json({ success: false, message: "Token inválido o expirado" });
+        }
+    };
+};
+
+module.exports = authorize;

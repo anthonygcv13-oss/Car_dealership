@@ -1,39 +1,21 @@
-const { Pool } = require('pg');
+const { Sequelize } = require('sequelize');
 require('dotenv').config();
 
-// Definimos cuál base de datos usar (puedes cambiar 'local' por 'neon' manualmente)
-// En lugar de: const ambiente = 'local';
-const ambiente = process.env.NODE_ENV === 'production' ? 'neon' : 'local';
+// Determinamos qué URL usar
+const isProduction = process.env.NODE_ENV === 'production';
+const connectionString = isProduction 
+  ? process.env.DATABASE_URL_NEON 
+  : process.env.DATABASE_URL_LOCAL;
 
-let config;
-
-if (ambiente === 'neon') {
-    // Configuración para Neon usando la URL completa
-    config = {
-        connectionString: process.env.DATABASE_URL,
-        ssl: {
-            rejectUnauthorized: false // Requerido para conexiones seguras en Neon
-        }
-    };
-} else {
-    // Tu configuración local que ya tenías
-    config = {
-        user: process.env.DB_USER,
-        host: process.env.DB_HOST,
-        database: process.env.DB_NAME,
-        password: process.env.DB_PASSWORD,
-        port: process.env.DB_PORT,
-    };
-}
-
-const pool = new Pool(config);
-
-pool.on('connect', () => {
-    console.log(`Conectado a PostgreSQL (${ambiente})`);
+const sequelize = new Sequelize(connectionString, {
+  dialect: 'postgres',
+  logging: false, 
+  dialectOptions: {
+    ssl: isProduction ? {
+      require: true,
+      rejectUnauthorized: false 
+    } : false
+  }
 });
 
-pool.on('error', (err) => {
-    console.error('Error inesperado en el pool:', err);
-});
-
-module.exports = pool;
+module.exports = sequelize;

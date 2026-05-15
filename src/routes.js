@@ -4,6 +4,7 @@ const router = express.Router();
 // Importamos el archivo de rutas de user_account con su nombre correcto
 
 const userAccountRoutes = require('./routes/user_account_routes.js');
+const authRoutes = require('./routes/auth_routes'); // <-- Nueva línea
 const vehicleRoutes = require('./routes/vehicle_routes.js');
 const vehiclesaleRoutes = require('./routes/vehicle_sale_routes.js');
 
@@ -25,6 +26,7 @@ const auditlogRoutes = require('./routes/audit_log_routes.js');
 // Esto significa que la URL final será /api/users/
 
 router.use('/users', userAccountRoutes);
+router.use('/auth', authRoutes); // <-- Nueva línea (Prefijo /auth)
 router.use('/vehicles', vehicleRoutes);
 router.use('/vehicle-sale', vehiclesaleRoutes);
 

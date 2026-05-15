@@ -1,28 +1,62 @@
-const pool = require('../config/db.js');
+const VehicleSale = require('../models/vehicle_sale.js');
+const Vehicle = require('../models/vehicle.js');
+const sequelize = require('../config/db.js');
 
 const getAllVehiclesale = async () => {
-  const result = await pool.query('SELECT * FROM vehicle_sale');
-  return result.rows;
+    return await VehicleSale.findAll();
 };
 
 const createVehiclesale = async (saleData) => {
-  const { date, final_price, sale_type, id_user, id_customer, id_vehicle, id_financing_plan } = saleData;
-  const query = 'INSERT INTO vehicle_sale (date, final_price, sale_type, id_user, id_customer, id_vehicle, id_financing_plan) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *';
-  const result = await pool.query(query, [date, final_price, sale_type, id_user, id_customer, id_vehicle, id_financing_plan]);
-  return result.rows[0];
+    const { date, final_price, sale_type, id_user, id_customer, id_vehicle, id_financing_plan } = saleData;
+
+    // Usar sequelize.transaction() para asegurar atomicidad
+    const result = await sequelize.transaction(async (transaction) => {
+        // 1. Crear la venta
+        const sale = await VehicleSale.create({
+            date,
+            final_price,
+            sale_type,
+            id_user,
+            id_customer,
+            id_vehicle,
+            id_financing_plan
+        }, { transaction });
+
+        // 2. Actualizar el status del vehículo a 'sold'
+        await Vehicle.update(
+            { status: 'sold' },
+            {
+                where: { id_vehicle },
+                transaction
+            }
+        );
+
+        return sale;
+    });
+
+    return result;
 };
 
 const updateVehiclesale = async (id, saleData) => {
-  const { date, final_price, sale_type, id_user, id_customer, id_vehicle, id_financing_plan } = saleData;
-  const query = 'UPDATE vehicle_sale SET date = $1, final_price = $2, sale_type = $3, id_user = $4, id_customer = $5, id_vehicle = $6, id_financing_plan = $7 WHERE id_vehicle_sale = $8 RETURNING *';
-  const result = await pool.query(query, [date, final_price, sale_type, id_user, id_customer, id_vehicle, id_financing_plan, id]);
-  return result.rows[0];
+    const [updatedRows] = await VehicleSale.update(saleData, {
+        where: { id_vehicle_sale: id }
+    });
+
+    if (updatedRows === 0) return null;
+
+    return await VehicleSale.findByPk(id);
 };
 
 const deleteVehiclesale = async (id) => {
-  const query = 'DELETE FROM vehicle_sale WHERE id_vehicle_sale = $1 RETURNING *';
-  const result = await pool.query(query, [id]);
-  return result.rows[0];
+    const saleToDelete = await VehicleSale.findByPk(id);
+    
+    if (saleToDelete) {
+        await VehicleSale.destroy({
+            where: { id_vehicle_sale: id }
+        });
+    }
+    
+    return saleToDelete;
 };
 
 module.exports = { getAllVehiclesale, createVehiclesale, updateVehiclesale, deleteVehiclesale };

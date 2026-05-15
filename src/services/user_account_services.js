@@ -1,41 +1,56 @@
-const pool = require('../config/db.js'); // Tu conexión inteligente local/neon
+const UserAccount = require('../models/user_account.js'); // Importamos el modelo de Sequelize
+const bcrypt = require('bcrypt');
 
 // --- LEER TODOS ---
 const getAllUserAccounts = async () => {
-    const result = await pool.query('SELECT * FROM user_account');
-    return result.rows;
+    // Sequelize: findAll() reemplaza al "SELECT * FROM"
+    return await UserAccount.findAll();
 };
 
 // --- CREAR (POST) ---
 const createUserAccount = async (userData) => {
     const { first_name, email, password, status, id_role } = userData;
-    // Usamos tus nombres de columna: first_name, email, password, status, id_role
-    const query = `
-        INSERT INTO user_account (first_name, email, password, status, id_role) 
-        VALUES ($1, $2, $3, $4, $5) RETURNING *`;
-    
-    const result = await pool.query(query, [first_name, email, password, status, id_role]);
-    return result.rows[0];
+
+    // 1. Encriptación (Mantenemos Bcrypt igual)
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    // 2. Inserción con Sequelize: .create() reemplaza al INSERT INTO
+    // Sequelize se encarga de mapear los campos automáticamente
+    return await UserAccount.create({
+        first_name,
+        email,
+        password: hashedPassword, // Guardamos la contraseña encriptada
+        status,
+        id_role
+    });
 };
 
 // --- ACTUALIZAR (PUT) ---
 const updateUserAccount = async (id, userData) => {
-    const { first_name, email, status, id_role } = userData;
-    const query = `
-        UPDATE user_account 
-        SET first_name = $1, email = $2, status = $3, id_role = $4 
-        WHERE id_user = $5 RETURNING *`;
-    
-    const result = await pool.query(query, [first_name, email, status, id_role, id]);
-    return result.rows[0];
+    // .update() recibe los datos y un objeto "where" para el ID
+    const [updatedRows] = await UserAccount.update(userData, {
+        where: { id_user: id }
+    });
+
+    if (updatedRows === 0) return null;
+
+    // Retornamos el registro actualizado buscándolo por su ID
+    return await UserAccount.findByPk(id);
 };
 
 // --- ELIMINAR (DELETE) ---
 const deleteUserAccount = async (id) => {
-    // Tu llave primaria es id_user
-    const query = 'DELETE FROM user_account WHERE id_user = $1 RETURNING *';
-    const result = await pool.query(query, [id]);
-    return result.rows[0];
+    // Buscamos el usuario antes de eliminarlo para poder retornarlo (como hacía RETURNING *)
+    const userToDelete = await UserAccount.findByPk(id);
+    
+    if (userToDelete) {
+        await UserAccount.destroy({
+            where: { id_user: id }
+        });
+    }
+    
+    return userToDelete;
 };
 
 module.exports = {

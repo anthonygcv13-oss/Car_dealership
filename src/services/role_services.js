@@ -1,28 +1,37 @@
-const pool = require('../config/db.js');
+const Role = require('../models/role.js');
 
 const getAllRoles = async () => {
-  const result = await pool.query('SELECT * FROM role');
-  return result.rows;
+    return await Role.findAll();
 };
 
 const createRole = async (roleData) => {
-  const { name, description } = roleData;
-  const query = 'INSERT INTO role (name, description) VALUES ($1, $2) RETURNING *';
-  const result = await pool.query(query, [name, description]);
-  return result.rows[0];
+    const { name, description } = roleData;
+    return await Role.create({
+        name,
+        description
+    });
 };
 
 const updateRole = async (id, roleData) => {
-  const { name, description } = roleData;
-  const query = 'UPDATE role SET name = $1, description = $2 WHERE id_role = $3 RETURNING *';
-  const result = await pool.query(query, [name, description, id]);
-  return result.rows[0];
+    const [updatedRows] = await Role.update(roleData, {
+        where: { id_role: id }
+    });
+
+    if (updatedRows === 0) return null;
+
+    return await Role.findByPk(id);
 };
 
 const deleteRole = async (id) => {
-  const query = 'DELETE FROM role WHERE id_role = $1 RETURNING *';
-  const result = await pool.query(query, [id]);
-  return result.rows[0];
+    const roleToDelete = await Role.findByPk(id);
+    
+    if (roleToDelete) {
+        await Role.destroy({
+            where: { id_role: id }
+        });
+    }
+    
+    return roleToDelete;
 };
 
 module.exports = { getAllRoles, createRole, updateRole, deleteRole };
