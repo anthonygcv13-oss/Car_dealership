@@ -4,6 +4,7 @@ const sequelize = require('../config/db.js');
 const UserAccount = sequelize.define('UserAccount', {
   id_user: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   first_name: { type: DataTypes.STRING }, // Agregamos esta
+  last_name: { type: DataTypes.STRING },
   email: { type: DataTypes.STRING, unique: true },
   password: { type: DataTypes.STRING },
   status: {type: DataTypes.STRING, allowNull: false, defaultValue: 'active' },// Opcional: valor por defecto     

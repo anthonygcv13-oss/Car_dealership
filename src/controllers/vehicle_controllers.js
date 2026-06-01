@@ -38,4 +38,29 @@ const deleteVehicle = async (req, res) => {
   }
 };
 
-module.exports = { getVehicles, createVehicle, updateVehicle, deleteVehicle };
+const getAvailableVehicle = async (req, res) => {
+  try {
+    const { id_model } = req.params;
+    const data = await vehicleService.getFirstAvailableVehicle(id_model);
+    if (!data) {
+      return res.status(404).json({ success: false, message: 'No hay vehículos disponibles para este modelo' });
+    }
+    // Filtrar campos confidenciales
+    const publicVehicle = {
+      id_vehicle: data.id_vehicle,
+      color: data.color,
+      year: data.year,
+      sale_price: data.sale_price,
+      mileage: data.mileage,
+      id_model: data.id_model,
+      id_brand: data.id_brand,
+      status: data.status
+    };
+    res.json({ success: true, data: publicVehicle });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+module.exports = { getVehicles, createVehicle, updateVehicle, deleteVehicle, getAvailableVehicle };
+

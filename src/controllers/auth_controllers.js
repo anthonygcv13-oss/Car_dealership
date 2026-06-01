@@ -41,7 +41,7 @@ const forgotPassword = async (req, res) => {
 const resetPassword = async (req, res) => {
     try {
         const { token } = req.params; // Viene de la URL
-        const { newPassword } = req.body;
+        const newPassword = req.body.newPassword || req.body.password;
         
         // Llamamos al servicio que valida el token y actualiza la DB
         const result = await authServices.resetPassword(token, newPassword);

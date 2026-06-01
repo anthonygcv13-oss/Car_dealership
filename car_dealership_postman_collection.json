@@ -5,10 +5,25 @@
     "description": "Colección para pruebas de la API de concesionaria. Incluye los endpoints principales y las validaciones actuales.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
   "variable": [
     {
       "key": "baseUrl",
       "value": "http://localhost:3000/api",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
       "type": "string"
     }
   ],
@@ -18,6 +33,20 @@
       "item": [
         {
           "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.token) {",
+                  "    pm.collectionVariables.set(\"token\", response.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -80,6 +109,63 @@
               "raw": "{\n  \"password\": \"newsecret123\"\n}"
             },
             "description": "Restablecer contraseña con token. Reemplazar :token por el token real."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Profile",
+      "item": [
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/profile",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "profile"
+              ]
+            },
+            "description": "Obtener los datos del usuario en sesión (id, email, nombre, apellido, rol). Requiere cabecera Authorization: Bearer <token>."
+          }
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/profile_update",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "profile_update"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"John Updated\",\n  \"last_name\": \"Doe Updated\",\n  \"email\": \"john.updated@example.com\"\n}"
+            },
+            "description": "Actualizar los datos del usuario en sesión (nombre, apellido, email, password). El rol y estado no se pueden actualizar por seguridad."
           }
         }
       ]
@@ -346,6 +432,561 @@
               "host": ["{{baseUrl}}"],
               "path": ["quotes", ":id"]
             }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Brands",
+      "item": [
+        {
+          "name": "Get Brands",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/brands",
+              "host": ["{{baseUrl}}"],
+              "path": ["brands"]
+            },
+            "description": "Listar todas las marcas del concesionario."
+          }
+        },
+        {
+          "name": "Create Brand",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/brands",
+              "host": ["{{baseUrl}}"],
+              "path": ["brands"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Tesla\",\n  \"description\": \"Vehículos eléctricos premium\",\n  \"country_origin\": \"USA\",\n  \"website\": \"https://www.tesla.com\"\n}"
+            },
+            "description": "Registrar una nueva marca."
+          }
+        },
+        {
+          "name": "Update Brand",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/brands/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["brands", ":id"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Tesla Inc.\",\n  \"description\": \"Autos eléctricos y energía limpia\",\n  \"country_origin\": \"USA\",\n  \"website\": \"https://www.tesla.com\"\n}"
+            },
+            "description": "Actualizar marca por ID. Reemplazar :id con el ID real."
+          }
+        },
+        {
+          "name": "Delete Brand",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/brands/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["brands", ":id"]
+            },
+            "description": "Eliminar marca por ID."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Models",
+      "item": [
+        {
+          "name": "Get Models",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/models",
+              "host": ["{{baseUrl}}"],
+              "path": ["models"]
+            },
+            "description": "Listar todos los modelos de vehículos."
+          }
+        },
+        {
+          "name": "Create Model",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/models",
+              "host": ["{{baseUrl}}"],
+              "path": ["models"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Model Y\",\n  \"id_brand\": 1,\n  \"fuel_type\": \"electric\",\n  \"transmission\": \"automatic\",\n  \"body_type\": \"suv\"\n}"
+            },
+            "description": "Registrar un nuevo modelo. Nota: id_brand debe corresponder a una marca existente. fuel_type debe ser uno de: gasoline, diesel, electric, hybrid, gas."
+          }
+        },
+        {
+          "name": "Update Model",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/models/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["models", ":id"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Model Y Performance\",\n  \"fuel_type\": \"electric\"\n}"
+            },
+            "description": "Actualizar modelo por ID. Reemplazar :id con el ID real."
+          }
+        },
+        {
+          "name": "Delete Model",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/models/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["models", ":id"]
+            },
+            "description": "Eliminar modelo por ID."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Customers",
+      "item": [
+        {
+          "name": "Get Customers",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/customers",
+              "host": ["{{baseUrl}}"],
+              "path": ["customers"]
+            },
+            "description": "Listar todos los clientes registrados."
+          }
+        },
+        {
+          "name": "Create Customer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/customers",
+              "host": ["{{baseUrl}}"],
+              "path": ["customers"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"Carlos\",\n  \"last_name\": \"Gómez\",\n  \"document\": \"12345678-A\",\n  \"phone\": \"600-123456\",\n  \"email\": \"carlos@example.com\",\n  \"address\": \"Avenida Diagonal 45\"\n}"
+            },
+            "description": "Registrar un nuevo cliente."
+          }
+        },
+        {
+          "name": "Update Customer",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/customers/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["customers", ":id"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"Carlos Alberto\",\n  \"address\": \"Avenida Diagonal 45, Piso 3\"\n}"
+            },
+            "description": "Actualizar datos de un cliente. Reemplazar :id con el ID real."
+          }
+        },
+        {
+          "name": "Delete Customer",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/customers/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["customers", ":id"]
+            },
+            "description": "Eliminar cliente por ID."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Suppliers",
+      "item": [
+        {
+          "name": "Get Suppliers",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/suppliers",
+              "host": ["{{baseUrl}}"],
+              "path": ["suppliers"]
+            },
+            "description": "Listar todos los proveedores registrados."
+          }
+        },
+        {
+          "name": "Create Supplier",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/suppliers",
+              "host": ["{{baseUrl}}"],
+              "path": ["suppliers"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Distribuidora Global S.A.\",\n  \"tax_id\": \"98765432-B\",\n  \"phone\": \"611-223344\",\n  \"address\": \"Polígono Industrial Norte, Nave 12\",\n  \"payment_terms\": \"NET30\"\n}"
+            },
+            "description": "Registrar un nuevo proveedor."
+          }
+        },
+        {
+          "name": "Update Supplier",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/suppliers/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["suppliers", ":id"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Distribuidora Global S.A. e Hijos\",\n  \"payment_terms\": \"NET45\"\n}"
+            },
+            "description": "Actualizar proveedor por ID. Reemplazar :id con el ID real."
+          }
+        },
+        {
+          "name": "Delete Supplier",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/suppliers/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["suppliers", ":id"]
+            },
+            "description": "Eliminar proveedor por ID."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Roles",
+      "item": [
+        {
+          "name": "Get Roles",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/roles",
+              "host": ["{{baseUrl}}"],
+              "path": ["roles"]
+            },
+            "description": "Listar todos los roles del sistema."
+          }
+        },
+        {
+          "name": "Create Role",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/roles",
+              "host": ["{{baseUrl}}"],
+              "path": ["roles"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Gestor de Flota\",\n  \"description\": \"Gestión de vehículos y catálogo\"\n}"
+            },
+            "description": "Crear un nuevo rol en el sistema."
+          }
+        },
+        {
+          "name": "Update Role",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/roles/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["roles", ":id"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Coordinador de Flota\",\n  \"description\": \"Gestión avanzada de vehículos y stock\"\n}"
+            },
+            "description": "Actualizar rol por ID. Reemplazar :id con el ID real."
+          }
+        },
+        {
+          "name": "Delete Role",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/roles/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["roles", ":id"]
+            },
+            "description": "Eliminar rol por ID."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Financing Plans",
+      "item": [
+        {
+          "name": "Get Financing Plans",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/financing-plans",
+              "host": ["{{baseUrl}}"],
+              "path": ["financing-plans"]
+            },
+            "description": "Listar todos los planes de financiación disponibles."
+          }
+        },
+        {
+          "name": "Create Financing Plan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/financing-plans",
+              "host": ["{{baseUrl}}"],
+              "path": ["financing-plans"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Plan Joven 12 Cuotas\",\n  \"interest_rate\": 3.25,\n  \"number_installments\": 12\n}"
+            },
+            "description": "Registrar un nuevo plan de financiación."
+          }
+        },
+        {
+          "name": "Update Financing Plan",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/financing-plans/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["financing-plans", ":id"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Plan Joven 12 Cuotas Reducido\",\n  \"interest_rate\": 2.99\n}"
+            },
+            "description": "Actualizar plan de financiación por ID. Reemplazar :id con el ID real."
+          }
+        },
+        {
+          "name": "Delete Financing Plan",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/financing-plans/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["financing-plans", ":id"]
+            },
+            "description": "Eliminar plan de financiación por ID."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Vehicle Images",
+      "item": [
+        {
+          "name": "Get Vehicle Images",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/vehicle-images",
+              "host": ["{{baseUrl}}"],
+              "path": ["vehicle-images"]
+            },
+            "description": "Obtener todas las imágenes de vehículos sin filtrar."
+          }
+        },
+        {
+          "name": "Get Vehicle Images by Vehicle ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/vehicle-images?id_vehicle=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["vehicle-images"],
+              "query": [
+                {
+                  "key": "id_vehicle",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Obtener todas las imágenes asociadas a un vehículo en específico."
+          }
+        },
+        {
+          "name": "Get Vehicle Image by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/vehicle-images/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["vehicle-images", ":id"]
+            },
+            "description": "Obtener el detalle de una imagen por su ID."
+          }
+        },
+        {
+          "name": "Create Vehicle Image",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/vehicle-images",
+              "host": ["{{baseUrl}}"],
+              "path": ["vehicle-images"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_vehicle\": 1,\n  \"url\": \"https://example.com/images/vehicle1.jpg\",\n  \"is_primary\": true,\n  \"display_order\": 1\n}"
+            },
+            "description": "Crear una nueva imagen para un vehículo. Requiere autorización (rol Admin o Manager)."
+          }
+        },
+        {
+          "name": "Update Vehicle Image",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/vehicle-images/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["vehicle-images", ":id"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"https://example.com/images/vehicle1_updated.jpg\",\n  \"is_primary\": false,\n  \"display_order\": 2\n}"
+            },
+            "description": "Actualizar propiedades de una imagen de vehículo existente. Requiere autorización (rol Admin o Manager)."
+          }
+        },
+        {
+          "name": "Delete Vehicle Image",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/vehicle-images/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["vehicle-images", ":id"]
+            },
+            "description": "Eliminar una imagen de vehículo por su ID. Requiere rol de Administrador."
           }
         }
       ]

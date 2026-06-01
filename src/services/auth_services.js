@@ -59,9 +59,10 @@ const sendResetPasswordEmail = async (email) => {
     // 3. Crear el enlace que se enviará al usuario
     const resetUrl = `http://localhost:3000/api/auth/reset-password/${resetToken}`;
 
-    // 4. Enviar el correo usando tu configuración del .env
+    // 4. Enviar el correo usando nodemailer configurado
+    const fromAddress = process.env.EMAIL_USER || 'soporte@tudominio.com';
     await transporter.sendMail({
-        from: '"Soporte Car Dealership" <soporte@tudominio.com>',
+        from: `"Soporte Car Dealership" <${fromAddress}>`,
         to: user.email, // El correo del usuario que sacamos de la DB
         subject: "Recuperación de Contraseña - Car Dealership",
         html: `
@@ -78,24 +79,29 @@ const sendResetPasswordEmail = async (email) => {
 
 // --- NUEVA FUNCIÓN: CAMBIAR LA CONTRASEÑA ---
 const resetPassword = async (token, newPassword) => {
+    if (!newPassword) {
+        throw new Error('La nueva contraseña es requerida.');
+    }
+
+    let decoded;
     try {
         // 1. Verificar si el token es válido y no ha expirado
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        
-        // 2. Encriptar la nueva contraseña
-        const saltRounds = 10;
-        const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
-
-        // 3. Actualizar la base de datos
-        await UserAccount.update(
-            { password: hashedPassword },
-            { where: { id_user: decoded.id } }
-        );
-
-        return { message: "Tu contraseña ha sido actualizada con éxito." };
+        decoded = jwt.verify(token, process.env.JWT_SECRET);
     } catch (error) {
         throw new Error('El enlace es inválido o ha expirado. Por favor, solicita uno nuevo.');
     }
+
+    // 2. Encriptar la nueva contraseña
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+
+    // 3. Actualizar la base de datos
+    await UserAccount.update(
+        { password: hashedPassword },
+        { where: { id_user: decoded.id } }
+    );
+
+    return { message: "Tu contraseña ha sido actualizada con éxito." };
 };
 
 module.exports = {

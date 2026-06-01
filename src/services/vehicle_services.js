@@ -46,4 +46,13 @@ const deleteVehicle = async (id) => {
     return vehicleToDelete;
 };
 
-module.exports = { getAllVehicles, createVehicle, updateVehicle, deleteVehicle };
+const getFirstAvailableVehicle = async (id_model) => {
+    return await Vehicle.findOne({
+        where: {
+            id_model: id_model,
+            status: 'available'
+        }
+    });
+};
+
+module.exports = { getAllVehicles, createVehicle, updateVehicle, deleteVehicle, getFirstAvailableVehicle };

@@ -21,6 +21,8 @@ const customerRoutes = require('./routes/customer_routes.js');
 const brandRoutes = require('./routes/brand_routes.js');
 
 const auditlogRoutes = require('./routes/audit_log_routes.js');
+const profileRoutes = require('./routes/profile_routes.js');
+const vehicleImageRoutes = require('./routes/vehicle_image_routes.js');
 
 // Registramos estas rutas bajo el prefijo '/users'
 // Esto significa que la URL final será /api/users/
@@ -29,6 +31,7 @@ router.use('/users', userAccountRoutes);
 router.use('/auth', authRoutes); // <-- Nueva línea (Prefijo /auth)
 router.use('/vehicles', vehicleRoutes);
 router.use('/vehicle-sale', vehiclesaleRoutes);
+router.use('/vehicle-images', vehicleImageRoutes);
 
 router.use('/suppliers', supplierRoutes);
 router.use('/roles', roleRoutes);
@@ -43,7 +46,7 @@ router.use('/customers', customerRoutes);
 router.use('/brands', brandRoutes);
 
 router.use('/audit-logs', auditlogRoutes);
-
+router.use('/', profileRoutes);
 
 // Aquí irás agregando más tablas después, ej:
 // const vehicleRoutes = require('./routes/vehicle_routes');

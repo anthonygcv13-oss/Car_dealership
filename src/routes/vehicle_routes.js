@@ -4,6 +4,7 @@ const vehicleController = require('../controllers/vehicle_controllers.js');
 const authorize = require('../middleware/auth_middleware.js');
 
 // src/routes/vehicle_routes.js
+router.get('/available/:id_model', vehicleController.getAvailableVehicle);
 router.get('/', authorize([1, 2, 3]), vehicleController.getVehicles); // Todos ven
 router.post('/', authorize([1, 2]), vehicleController.createVehicle); // Solo jefes
 router.put('/:id', authorize([1, 2]), vehicleController.updateVehicle);
