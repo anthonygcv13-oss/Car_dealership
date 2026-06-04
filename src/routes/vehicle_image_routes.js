@@ -8,8 +8,8 @@ router.get('/', vehicleImageController.getVehicleImages);
 router.get('/:id', vehicleImageController.getVehicleImage);
 
 // Protected routes (Admin & Manager can add / edit images)
-router.post('/', authorize([1, 2]), vehicleImageController.createVehicleImage);
-router.put('/:id', authorize([1, 2]), vehicleImageController.updateVehicleImage);
+router.post('/', authorize([1, 3]), vehicleImageController.createVehicleImage);
+router.put('/:id', authorize([1, 3]), vehicleImageController.updateVehicleImage);
 
 // Only Admin can delete vehicle images
 router.delete('/:id', authorize([1]), vehicleImageController.deleteVehicleImage);

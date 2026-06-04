@@ -6,8 +6,12 @@ const Supplier = sequelize.define('Supplier', {
   name: { type: DataTypes.STRING },
   tax_id: { type: DataTypes.STRING },
   phone: { type: DataTypes.STRING },
+  alternate_phone: { type: DataTypes.STRING },
+  email: { type: DataTypes.STRING },
+  alternate_email: { type: DataTypes.STRING },
   address: { type: DataTypes.STRING },
-  payment_terms: { type: DataTypes.STRING }
+  payment_terms: { type: DataTypes.STRING },
+  status: { type: DataTypes.STRING }
 }, {
   tableName: 'supplier',
   timestamps: false

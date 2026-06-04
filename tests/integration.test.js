@@ -29,9 +29,9 @@ const generateTestToken = (userId, roleId) => {
 };
 
 const adminToken = generateTestToken(101, 1);    // Rol 1: Admin
-const managerToken = generateTestToken(102, 2);  // Rol 2: Manager
-const sellerToken = generateTestToken(103, 3);   // Rol 3: Seller
-const guestToken = generateTestToken(104, 4);    // Rol 4: No permitido para ver/editar vehículos
+const sellerToken = generateTestToken(103, 2);   // Rol 2: Vendedor (Seller)
+const managerToken = generateTestToken(102, 3);  // Rol 3: Gerente (Manager)
+const guestToken = generateTestToken(104, 5);    // Rol 5: Soporte / No permitido
 
 // ==========================================
 // ESQUEMAS DE VALIDACIÓN ZOD PARA RESPUESTAS
@@ -127,6 +127,11 @@ const errorResponseSchema = z.object({
 // ==========================================
 
 describe('Pruebas de Integración - API Car Dealership', () => {
+
+  beforeAll(async () => {
+    const Notification = require('../src/models/notification.js');
+    await Notification.sync();
+  });
 
   // Limpieza final de la base de datos tras ejecutar todas las pruebas
   afterAll(async () => {

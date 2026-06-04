@@ -25,9 +25,9 @@ const generateTestToken = (userId, roleId) => {
 };
 
 const adminToken = generateTestToken(101, 1);    // Rol 1: Admin
-const managerToken = generateTestToken(102, 2);  // Rol 2: Manager
-const sellerToken = generateTestToken(103, 3);   // Rol 3: Seller
-const guestToken = generateTestToken(104, 4);    // Rol 4: Guest
+const sellerToken = generateTestToken(103, 2);   // Rol 2: Vendedor (Seller)
+const managerToken = generateTestToken(102, 3);  // Rol 3: Gerente (Manager)
+const guestToken = generateTestToken(104, 5);    // Rol 5: Soporte (Guest)
 
 // Esquemas de validación Zod para respuestas
 const vehicleImageSchema = z.object({
@@ -51,6 +51,10 @@ const detailResponseSchema = z.object({
 describe('Pruebas de Integración - Endpoints de Imágenes de Vehículos (/api/vehicle-images)', () => {
 
   beforeAll(async () => {
+    // Sincronizar modelos
+    const Notification = require('../src/models/notification.js');
+    await Notification.sync();
+
     // 1. Crear marca temporal
     const brand = await Brand.create({
       name: `Brand Image Test ${Date.now()}`,

@@ -28,8 +28,19 @@ const createUserAccount = async (userData) => {
 
 // --- ACTUALIZAR (PUT) ---
 const updateUserAccount = async (id, userData) => {
+    const dataToUpdate = { ...userData };
+    
+    // Si viene la contraseña y no está vacía, la encriptamos
+    if (dataToUpdate.password && dataToUpdate.password.trim() !== '') {
+        const saltRounds = 10;
+        dataToUpdate.password = await bcrypt.hash(dataToUpdate.password, saltRounds);
+    } else {
+        // De lo contrario, quitamos la propiedad para no sobreescribir la contraseña existente
+        delete dataToUpdate.password;
+    }
+
     // .update() recibe los datos y un objeto "where" para el ID
-    const [updatedRows] = await UserAccount.update(userData, {
+    const [updatedRows] = await UserAccount.update(dataToUpdate, {
         where: { id_user: id }
     });
 

@@ -7,7 +7,8 @@ const Quote = sequelize.define('Quote', {
   estimated_price: { type: DataTypes.DECIMAL(10, 2) },
   validity_date: { type: DataTypes.DATE },
   id_vehicle: { type: DataTypes.INTEGER },
-  id_customer: { type: DataTypes.INTEGER }
+  id_customer: { type: DataTypes.INTEGER },
+  status: { type: DataTypes.STRING }
 }, {
   tableName: 'quote',
   timestamps: false

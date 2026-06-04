@@ -6,7 +6,8 @@ const Brand = sequelize.define('Brand', {
   name: { type: DataTypes.STRING },
   description: { type: DataTypes.STRING },
   country_origin: { type: DataTypes.STRING },
-  website: { type: DataTypes.STRING }
+  website: { type: DataTypes.STRING },
+  status: { type: DataTypes.STRING }
 }, {
   tableName: 'brand',
   timestamps: false

@@ -5,8 +5,8 @@ const authorize = require('../middleware/auth_middleware.js'); // Importamos el 
 
 // --- RUTAS PROTEGIDAS ---
 
-// Solo el Admin (Rol 1) puede ver la lista de todos los usuarios
-router.get('/', authorize([1,2,5]), userAccountControllers.getUserAccounts);
+// Solo el Admin, Gerente y Soporte pueden ver la lista de todos los usuarios
+router.get('/', authorize([1,3,5]), userAccountControllers.getUserAccounts);
 
 // Solo el Admin puede crear nuevas cuentas (por ejemplo, para otros empleados)
 router.post('/', authorize([1]), userAccountControllers.createAccount);

@@ -8,7 +8,8 @@ const Payment = sequelize.define('Payment', {
   payment_method: { type: DataTypes.STRING },
   id_user: { type: DataTypes.INTEGER },
   id_vehicle_sale: { type: DataTypes.INTEGER },
-  id_installment: { type: DataTypes.INTEGER }
+  id_installment: { type: DataTypes.INTEGER },
+  status: { type: DataTypes.STRING }
 }, {
   tableName: 'payment',
   timestamps: false

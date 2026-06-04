@@ -7,7 +7,8 @@ const Installment = sequelize.define('Installment', {
   amount: { type: DataTypes.DECIMAL(10, 2) },
   due_date: { type: DataTypes.DATE },
   id_vehicle_sale: { type: DataTypes.INTEGER },
-  id_financing_plan: { type: DataTypes.INTEGER }
+  id_financing_plan: { type: DataTypes.INTEGER },
+  status: { type: DataTypes.STRING }
 }, {
   tableName: 'installment',
   timestamps: false

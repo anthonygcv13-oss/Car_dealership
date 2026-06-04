@@ -7,7 +7,8 @@ const saleSchema = z.object({
     id_user: z.number().int().positive(),
     id_customer: z.number().int().positive(),
     id_vehicle: z.number().int().positive(),
-    id_financing_plan: z.number().int().nullable().optional() // Puede ser nulo si es de contado
+    id_financing_plan: z.number().int().nullable().optional(), // Puede ser nulo si es de contado
+    status: z.string().optional().default('pending')
 });
 
 module.exports = { saleSchema };
