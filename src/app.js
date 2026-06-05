@@ -4,6 +4,9 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 require('dotenv').config();
 
+// Registrar asociaciones de base de datos
+require('./models/associations.js');
+
 // Importamos el hub central de rutas
 const routes = require('./routes.js'); 
 

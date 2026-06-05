@@ -1,7 +1,31 @@
 const Model = require('../models/model.js');
+const Brand = require('../models/brand.js');
+const Vehicle = require('../models/vehicle.js');
+const VehicleImage = require('../models/vehicle_image.js');
 
 const getAllModels = async () => {
-    return await Model.findAll();
+    return await Model.findAll({
+        include: [
+            {
+                model: Brand,
+                as: 'brand',
+                attributes: ['id_brand', 'name']
+            },
+            {
+                model: Vehicle,
+                as: 'vehicles',
+                where: { status: 'available' },
+                required: false,
+                include: [
+                    {
+                        model: VehicleImage,
+                        as: 'images',
+                        required: false
+                    }
+                ]
+            }
+        ]
+    });
 };
 
 const createModel = async (modelData) => {
