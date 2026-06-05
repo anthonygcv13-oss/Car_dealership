@@ -149,6 +149,7 @@
     "zod": "^4.4.3"
   },
   "scripts": {
+    "install": "npm install",
     "test": "jest --runInBand --detectOpenHandles",
     "start": "node src/server.js",
     "dev": "nodemon src/server.js"
