@@ -55,9 +55,17 @@ const resetPassword = async (req, res) => {
     }
 };
 
+// --- REDIRIGIR AL FRONTEND (GET) ---
+const redirectResetPassword = async (req, res) => {
+    const { token } = req.params;
+    const frontendUrl = process.env.FRONTEND_URL || 'http://127.0.0.1:3001';
+    res.redirect(301, `${frontendUrl}/reset-password?token=${token}`);
+};
+
 // IMPORTANTE: Exportar todas las funciones
 module.exports = { 
     login, 
     forgotPassword, 
-    resetPassword 
+    resetPassword,
+    redirectResetPassword
 };

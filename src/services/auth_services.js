@@ -2,6 +2,8 @@ const UserAccount = require('../models/user_account.js'); //
 const bcrypt = require('bcrypt'); //
 const jwt = require('jsonwebtoken'); //
 const transporter = require('../config/mailer.js');
+const fs = require('fs');
+const path = require('path');
 
 const login = async (email, password) => {
     // Buscamos al usuario por su correo
@@ -56,22 +58,41 @@ const sendResetPasswordEmail = async (email) => {
         { expiresIn: '15m' }
     );
 
-    // 3. Crear el enlace que se enviará al usuario
-    const resetUrl = `http://localhost:3000/api/auth/reset-password/${resetToken}`;
+    // 3. Crear el enlace que se enviará al usuario (apunta al frontend)
+    const frontendUrl = process.env.FRONTEND_URL || 'http://127.0.0.1:3001';
+    const resetUrl = `${frontendUrl}/reset-password?token=${resetToken}`;
 
-    // 4. Enviar el correo usando nodemailer configurado
+    // 4. Leer la plantilla HTML y reemplazar placeholders
+    // Intentamos buscar la plantilla en la ruta especificada en .env o en el panel administrativo vecino
+    let templatePath = process.env.EMAIL_TEMPLATE_PATH;
+    if (templatePath) {
+        // Resolver relativo al directorio raíz del proceso o ruta absoluta
+        templatePath = path.resolve(process.cwd(), templatePath);
+    }
+    
+    // Si no está configurada la variable o no existe el archivo, buscamos por defecto en el panel administrativo vecino
+    if (!templatePath || !fs.existsSync(templatePath)) {
+        const neighborPath = path.resolve(process.cwd(), '../Panel-administrativo-Car_dealers/templates/email-reset-password.html');
+        if (fs.existsSync(neighborPath)) {
+            templatePath = neighborPath;
+        } else {
+            // Fallback seguro a la plantilla local del backend
+            templatePath = path.join(__dirname, '../templates/email-reset-password.html');
+        }
+    }
+
+    let htmlTemplate = fs.readFileSync(templatePath, 'utf-8');
+    htmlTemplate = htmlTemplate.replace(/{{USER_NAME}}/g, user.first_name);
+    htmlTemplate = htmlTemplate.replace(/{{RESET_LINK}}/g, resetUrl);
+    htmlTemplate = htmlTemplate.replace(/{{EXPIRY_TIME}}/g, '15 minutos');
+
+    // 5. Enviar el correo usando nodemailer configurado
     const fromAddress = process.env.EMAIL_USER || 'soporte@tudominio.com';
     await transporter.sendMail({
-        from: `"Soporte Car Dealership" <${fromAddress}>`,
-        to: user.email, // El correo del usuario que sacamos de la DB
-        subject: "Recuperación de Contraseña - Car Dealership",
-        html: `
-            <h1>Hola ${user.first_name}</h1>
-            <p>Has solicitado restablecer tu contraseña. Haz clic en el siguiente enlace:</p>
-            <a href="${resetUrl}">Restablecer mi contraseña ahora</a>
-            <p>Este enlace expirará en 15 minutos.</p>
-            <p>Si no solicitaste este cambio, puedes ignorar este correo.</p>
-        `
+        from: `"CARLIZ - Panel Administrativo" <${fromAddress}>`,
+        to: user.email,
+        subject: "Recuperación de Contraseña - CARLIZ",
+        html: htmlTemplate
     });
 
     return { message: "Se ha enviado un enlace de recuperación a tu correo electrónico." };

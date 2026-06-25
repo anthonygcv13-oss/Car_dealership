@@ -1,29 +1,26 @@
 const { Sequelize } = require('sequelize');
-require('dotenv').config({ override: true });
+require('dotenv').config();
 
-// Leemos DATABASE_URL de las variables de entorno. Si no existe, decidimos según el NODE_ENV
+// Determinamos qué URL usar
 const isProduction = process.env.NODE_ENV === 'production';
-const connectionString = process.env.DATABASE_URL || (isProduction 
+const connectionString = isProduction 
   ? process.env.DATABASE_URL_NEON 
-  : process.env.DATABASE_URL_LOCAL);
-
-if (!connectionString) {
-  console.error("❌ Error: No se ha definido ninguna URL de base de datos en las variables de entorno.");
-  process.exit(1);
-}
-
-// Adaptación automática: Si la URL no apunta a localhost o 127.0.0.1, asumimos que es una base de datos en la nube (como Neon) que requiere SSL
-const isLocal = connectionString.includes('localhost') || connectionString.includes('127.0.0.1');
-const useSSL = !isLocal;
+  : process.env.DATABASE_URL_LOCAL;
 
 const sequelize = new Sequelize(connectionString, {
   dialect: 'postgres',
   logging: false, 
   dialectOptions: {
-    ssl: useSSL ? {
+    ssl: isProduction ? {
       require: true,
       rejectUnauthorized: false 
     } : false
+  },
+  pool: {
+    max: 2,
+    min: 0,
+    acquire: 30000,
+    idle: 1000
   }
 });
 

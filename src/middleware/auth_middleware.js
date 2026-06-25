@@ -2,13 +2,21 @@ const jwt = require('jsonwebtoken');
 
 const authorize = (rolesPermitidos = []) => {
     return (req, res, next) => {
-        // 1. Obtener el token del header (Authorization: Bearer TOKEN)
-        const authHeader = req.headers.authorization;
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        // 1. Obtener el token del header (Authorization: Bearer TOKEN) o x-access-token
+        const authHeader = req.headers.authorization || req.headers['x-access-token'];
+        if (!authHeader) {
             return res.status(401).json({ success: false, message: "No autorizado, falta token" });
         }
 
-        const token = authHeader.split(' ')[1];
+        let token = authHeader;
+        const bearerPrefix = 'bearer ';
+        if (authHeader.toLowerCase().startsWith(bearerPrefix)) {
+            token = authHeader.slice(bearerPrefix.length).trim();
+        }
+
+        if (!token) {
+            return res.status(401).json({ success: false, message: "No autorizado, falta token" });
+        }
 
         try {
             // 2. Verificar el token

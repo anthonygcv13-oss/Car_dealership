@@ -7,8 +7,9 @@ const UserAccount = sequelize.define('UserAccount', {
   last_name: { type: DataTypes.STRING },
   email: { type: DataTypes.STRING, unique: true },
   password: { type: DataTypes.STRING },
-  status: {type: DataTypes.STRING, allowNull: false, defaultValue: 'active' },// Opcional: valor por defecto     
-  id_role: { type: DataTypes.INTEGER }
+  status: { type: DataTypes.STRING, allowNull: false, defaultValue: 'active' }, // Opcional: valor por defecto
+  id_role: { type: DataTypes.INTEGER },
+  updated_at: { type: DataTypes.DATE, allowNull: true }
 }, {
   tableName: 'user_account',
   timestamps: false

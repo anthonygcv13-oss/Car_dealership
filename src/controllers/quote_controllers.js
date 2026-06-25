@@ -9,6 +9,19 @@ const getQuotes = async (req, res) => {
   }
 };
 
+const publicSearchQuotes = async (req, res) => {
+  try {
+    const { email, document } = req.query;
+    if (!email || !document) {
+      return res.status(400).json({ success: false, message: 'Faltan parámetros obligatorios: email y documento' });
+    }
+    const data = await quotesService.searchQuotesPublic(email, document);
+    res.json({ success: true, data });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
 const createQuote = async (req, res) => {
   try {
     const newItem = await quotesService.createQuote(req.body);
@@ -38,4 +51,4 @@ const deleteQuote = async (req, res) => {
   }
 };
 
-module.exports = { getQuotes, createQuote, updateQuote, deleteQuote };
+module.exports = { getQuotes, publicSearchQuotes, createQuote, updateQuote, deleteQuote };

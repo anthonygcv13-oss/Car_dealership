@@ -177,6 +177,16 @@
           "name": "Get Users",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"Ana\",\n  \"email\": \"ana@example.com\",\n  \"password\": \"password1\",\n  \"status\": \"active\",\n  \"id_role\": 2\n}"
+            },
             "url": {
               "raw": "{{baseUrl}}/users",
               "host": ["{{baseUrl}}"],
@@ -250,6 +260,16 @@
           "name": "Get Vehicles",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"brand_id\": 1,\n  \"model_id\": 1,\n  \"year\": 2025,\n  \"price\": 25000,\n  \"kilometers\": 0\n}"
+            },
             "url": {
               "raw": "{{baseUrl}}/vehicles",
               "host": ["{{baseUrl}}"],
@@ -323,6 +343,16 @@
           "name": "Get Sales",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"final_price\": 28000,\n  \"sale_type\": \"Contado\",\n  \"id_user\": 3,\n  \"id_customer\": 5,\n  \"id_vehicle\": 8,\n  \"id_financing_plan\": null\n}"
+            },
             "url": {
               "raw": "{{baseUrl}}/vehicle-sale",
               "host": ["{{baseUrl}}"],
@@ -374,6 +404,16 @@
           "name": "Get Quotes",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer_id\": 5,\n  \"vehicle_id\": 2,\n  \"amount\": 30000\n}"
+            },
             "url": {
               "raw": "{{baseUrl}}/quotes",
               "host": ["{{baseUrl}}"],
@@ -443,6 +483,16 @@
           "name": "Get Brands",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Tesla\",\n  \"description\": \"Vehículos eléctricos premium\",\n  \"country_origin\": \"USA\",\n  \"website\": \"https://www.tesla.com\"\n}"
+            },
             "url": {
               "raw": "{{baseUrl}}/brands",
               "host": ["{{baseUrl}}"],
@@ -516,6 +566,16 @@
           "name": "Get Models",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Model Y\",\n  \"id_brand\": 1,\n  \"fuel_type\": \"electric\",\n  \"transmission\": \"automatic\",\n  \"body_type\": \"suv\"\n}"
+            },
             "url": {
               "raw": "{{baseUrl}}/models",
               "host": ["{{baseUrl}}"],
@@ -589,6 +649,16 @@
           "name": "Get Customers",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"Carlos\",\n  \"last_name\": \"Gómez\",\n  \"document\": \"12345678-A\",\n  \"phone\": \"600-123456\",\n  \"email\": \"carlos@example.com\",\n  \"address\": \"Avenida Diagonal 45\"\n}"
+            },
             "url": {
               "raw": "{{baseUrl}}/customers",
               "host": ["{{baseUrl}}"],
@@ -662,6 +732,16 @@
           "name": "Get Suppliers",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Distribuidora Global S.A.\",\n  \"tax_id\": \"98765432-B\",\n  \"phone\": \"611-223344\",\n  \"address\": \"Polígono Industrial Norte, Nave 12\",\n  \"payment_terms\": \"NET30\"\n}"
+            },
             "url": {
               "raw": "{{baseUrl}}/suppliers",
               "host": ["{{baseUrl}}"],
@@ -735,6 +815,16 @@
           "name": "Get Roles",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Gestor de Flota\",\n  \"description\": \"Gestión de vehículos y catálogo\"\n}"
+            },
             "url": {
               "raw": "{{baseUrl}}/roles",
               "host": ["{{baseUrl}}"],
@@ -808,6 +898,16 @@
           "name": "Get Financing Plans",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Plan Joven 12 Cuotas\",\n  \"interest_rate\": 3.25,\n  \"number_installments\": 12\n}"
+            },
             "url": {
               "raw": "{{baseUrl}}/financing-plans",
               "host": ["{{baseUrl}}"],
@@ -881,6 +981,16 @@
           "name": "Get Vehicle Images",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_vehicle\": 1,\n  \"url\": \"https://example.com/images/vehicle1.jpg\",\n  \"is_primary\": true,\n  \"display_order\": 1\n}"
+            },
             "url": {
               "raw": "{{baseUrl}}/vehicle-images",
               "host": ["{{baseUrl}}"],

@@ -173,16 +173,34 @@ describe('Pruebas de Integración - API Car Dealership', () => {
   // ----------------------------------------------------
   describe('Endpoints de Marcas (/api/brands)', () => {
     
-    test('GET /api/brands - Debe retornar lista de marcas y coincidir con el esquema Zod', async () => {
+    test('GET /api/brands - Sin Token - Debe retornar 401', async () => {
       const response = await request(app)
         .get('/api/brands')
+        .expect(401);
+
+      expect(response.body.success).toBe(false);
+    });
+
+    test('GET /api/brands - Con Token Válido - Debe retornar lista de marcas y coincidir con el esquema Zod', async () => {
+      const response = await request(app)
+        .get('/api/brands')
+        .set('Authorization', `Bearer ${sellerToken}`)
         .expect(200);
 
       const validation = listResponseSchema(brandSchema).safeParse(response.body);
       expect(validation.success).toBe(true);
     });
 
-    test('POST /api/brands - Debe crear una nueva marca y coincidir con el esquema Zod', async () => {
+    test('POST /api/brands - Sin Token - Debe retornar 401', async () => {
+      const response = await request(app)
+        .post('/api/brands')
+        .send({ name: 'Test' })
+        .expect(401);
+
+      expect(response.body.success).toBe(false);
+    });
+
+    test('POST /api/brands - Con Token Admin - Debe crear una nueva marca y coincidir con el esquema Zod', async () => {
       const newBrandData = {
         name: 'Tesla Test Integration',
         description: 'Vehículos eléctricos de prueba',
@@ -192,6 +210,7 @@ describe('Pruebas de Integración - API Car Dealership', () => {
 
       const response = await request(app)
         .post('/api/brands')
+        .set('Authorization', `Bearer ${adminToken}`)
         .send(newBrandData)
         .expect(201);
 
@@ -221,16 +240,34 @@ describe('Pruebas de Integración - API Car Dealership', () => {
       createdBrandIds.push(testBrandId);
     });
 
-    test('GET /api/models - Debe retornar lista de modelos y coincidir con el esquema Zod', async () => {
+    test('GET /api/models - Sin Token - Debe retornar 401', async () => {
       const response = await request(app)
         .get('/api/models')
+        .expect(401);
+
+      expect(response.body.success).toBe(false);
+    });
+
+    test('GET /api/models - Con Token Válido - Debe retornar lista de modelos y coincidir con el esquema Zod', async () => {
+      const response = await request(app)
+        .get('/api/models')
+        .set('Authorization', `Bearer ${sellerToken}`)
         .expect(200);
 
       const validation = listResponseSchema(modelSchema).safeParse(response.body);
       expect(validation.success).toBe(true);
     });
 
-    test('POST /api/models - Debe crear un nuevo modelo y coincidir con el esquema Zod', async () => {
+    test('POST /api/models - Sin Token - Debe retornar 401', async () => {
+      const response = await request(app)
+        .post('/api/models')
+        .send({ name: 'Test' })
+        .expect(401);
+
+      expect(response.body.success).toBe(false);
+    });
+
+    test('POST /api/models - Con Token Admin - Debe crear un nuevo modelo y coincidir con el esquema Zod', async () => {
       const newModelData = {
         name: 'Model X Test',
         id_brand: testBrandId,
@@ -241,6 +278,7 @@ describe('Pruebas de Integración - API Car Dealership', () => {
 
       const response = await request(app)
         .post('/api/models')
+        .set('Authorization', `Bearer ${adminToken}`)
         .send(newModelData)
         .expect(201);
 
@@ -258,16 +296,34 @@ describe('Pruebas de Integración - API Car Dealership', () => {
   // ----------------------------------------------------
   describe('Endpoints de Clientes (/api/customers)', () => {
     
-    test('GET /api/customers - Debe retornar lista de clientes y coincidir con el esquema Zod', async () => {
+    test('GET /api/customers - Sin Token - Debe retornar 401', async () => {
       const response = await request(app)
         .get('/api/customers')
+        .expect(401);
+
+      expect(response.body.success).toBe(false);
+    });
+
+    test('GET /api/customers - Con Token Válido - Debe retornar lista de clientes y coincidir con el esquema Zod', async () => {
+      const response = await request(app)
+        .get('/api/customers')
+        .set('Authorization', `Bearer ${sellerToken}`)
         .expect(200);
 
       const validation = listResponseSchema(customerSchema).safeParse(response.body);
       expect(validation.success).toBe(true);
     });
 
-    test('POST /api/customers - Debe crear un nuevo cliente y coincidir con el esquema Zod', async () => {
+    test('POST /api/customers - Sin Token - Debe retornar 401', async () => {
+      const response = await request(app)
+        .post('/api/customers')
+        .send({ first_name: 'Test' })
+        .expect(401);
+
+      expect(response.body.success).toBe(false);
+    });
+
+    test('POST /api/customers - Con Token Válido - Debe crear un nuevo cliente y coincidir con el esquema Zod', async () => {
       const newCustomerData = {
         first_name: 'John Integration',
         last_name: 'Doe Test',
@@ -279,6 +335,7 @@ describe('Pruebas de Integración - API Car Dealership', () => {
 
       const response = await request(app)
         .post('/api/customers')
+        .set('Authorization', `Bearer ${sellerToken}`)
         .send(newCustomerData)
         .expect(201);
 
@@ -296,16 +353,34 @@ describe('Pruebas de Integración - API Car Dealership', () => {
   // ----------------------------------------------------
   describe('Endpoints de Roles (/api/roles)', () => {
     
-    test('GET /api/roles - Debe retornar lista de roles y coincidir con el esquema Zod', async () => {
+    test('GET /api/roles - Sin Token - Debe retornar 401', async () => {
       const response = await request(app)
         .get('/api/roles')
+        .expect(401);
+
+      expect(response.body.success).toBe(false);
+    });
+
+    test('GET /api/roles - Con Token Admin - Debe retornar lista de roles y coincidir con el esquema Zod', async () => {
+      const response = await request(app)
+        .get('/api/roles')
+        .set('Authorization', `Bearer ${adminToken}`)
         .expect(200);
 
       const validation = listResponseSchema(roleSchema).safeParse(response.body);
       expect(validation.success).toBe(true);
     });
 
-    test('POST /api/roles - Debe crear un nuevo rol y coincidir con el esquema Zod', async () => {
+    test('POST /api/roles - Sin Token - Debe retornar 401', async () => {
+      const response = await request(app)
+        .post('/api/roles')
+        .send({ name: 'Test' })
+        .expect(401);
+
+      expect(response.body.success).toBe(false);
+    });
+
+    test('POST /api/roles - Con Token Admin - Debe crear un nuevo rol y coincidir con el esquema Zod', async () => {
       const newRoleData = {
         name: 'Role Integration Test',
         description: 'Descripción de prueba para rol de integración'
@@ -313,6 +388,7 @@ describe('Pruebas de Integración - API Car Dealership', () => {
 
       const response = await request(app)
         .post('/api/roles')
+        .set('Authorization', `Bearer ${adminToken}`)
         .send(newRoleData)
         .expect(201);
 
@@ -330,16 +406,34 @@ describe('Pruebas de Integración - API Car Dealership', () => {
   // ----------------------------------------------------
   describe('Endpoints de Proveedores (/api/suppliers)', () => {
     
-    test('GET /api/suppliers - Debe retornar lista de proveedores y coincidir con el esquema Zod', async () => {
+    test('GET /api/suppliers - Sin Token - Debe retornar 401', async () => {
       const response = await request(app)
         .get('/api/suppliers')
+        .expect(401);
+
+      expect(response.body.success).toBe(false);
+    });
+
+    test('GET /api/suppliers - Con Token Admin - Debe retornar lista de proveedores y coincidir con el esquema Zod', async () => {
+      const response = await request(app)
+        .get('/api/suppliers')
+        .set('Authorization', `Bearer ${adminToken}`)
         .expect(200);
 
       const validation = listResponseSchema(supplierSchema).safeParse(response.body);
       expect(validation.success).toBe(true);
     });
 
-    test('POST /api/suppliers - Debe crear un nuevo proveedor y coincidir con el esquema Zod', async () => {
+    test('POST /api/suppliers - Sin Token - Debe retornar 401', async () => {
+      const response = await request(app)
+        .post('/api/suppliers')
+        .send({ name: 'Test' })
+        .expect(401);
+
+      expect(response.body.success).toBe(false);
+    });
+
+    test('POST /api/suppliers - Con Token Admin - Debe crear un nuevo proveedor y coincidir con el esquema Zod', async () => {
       const newSupplierData = {
         name: 'Supplier Integration Test Inc',
         tax_id: 'TAX-99988-INT',
@@ -350,6 +444,7 @@ describe('Pruebas de Integración - API Car Dealership', () => {
 
       const response = await request(app)
         .post('/api/suppliers')
+        .set('Authorization', `Bearer ${adminToken}`)
         .send(newSupplierData)
         .expect(201);
 
@@ -367,16 +462,34 @@ describe('Pruebas de Integración - API Car Dealership', () => {
   // ----------------------------------------------------
   describe('Endpoints de Planes de Financiamiento (/api/financing-plans)', () => {
     
-    test('GET /api/financing-plans - Debe retornar lista de planes de financiamiento y coincidir con el esquema Zod', async () => {
+    test('GET /api/financing-plans - Sin Token - Debe retornar 401', async () => {
       const response = await request(app)
         .get('/api/financing-plans')
+        .expect(401);
+
+      expect(response.body.success).toBe(false);
+    });
+
+    test('GET /api/financing-plans - Con Token Válido - Debe retornar lista de planes y coincidir con el esquema Zod', async () => {
+      const response = await request(app)
+        .get('/api/financing-plans')
+        .set('Authorization', `Bearer ${sellerToken}`)
         .expect(200);
 
       const validation = listResponseSchema(financingPlanSchema).safeParse(response.body);
       expect(validation.success).toBe(true);
     });
 
-    test('POST /api/financing-plans - Debe crear un nuevo plan de financiamiento y coincidir con el esquema Zod', async () => {
+    test('POST /api/financing-plans - Sin Token - Debe retornar 401', async () => {
+      const response = await request(app)
+        .post('/api/financing-plans')
+        .send({ name: 'Test' })
+        .expect(401);
+
+      expect(response.body.success).toBe(false);
+    });
+
+    test('POST /api/financing-plans - Con Token Admin - Debe crear un nuevo plan de financiamiento y coincidir con el esquema Zod', async () => {
       const newPlanData = {
         name: 'Plan Flex Integration',
         interest_rate: 5.5,
@@ -385,6 +498,7 @@ describe('Pruebas de Integración - API Car Dealership', () => {
 
       const response = await request(app)
         .post('/api/financing-plans')
+        .set('Authorization', `Bearer ${adminToken}`)
         .send(newPlanData)
         .expect(201);
 
@@ -694,6 +808,16 @@ describe('Pruebas de Integración - API Car Dealership', () => {
       expect(response.body.success).toBe(true);
       expect(response.body.message).toContain('Se ha enviado un enlace de recuperación');
       expect(sendMailSpy).toHaveBeenCalled();
+    });
+
+    test('GET /api/auth/reset-password/:token - Debe redirigir al frontend usando la IP 127.0.0.1', async () => {
+      const testToken = 'some-dummy-token';
+      const response = await request(app)
+        .get(`/api/auth/reset-password/${testToken}`)
+        .expect(301);
+
+      expect(response.headers.location).toContain('127.0.0.1:3001');
+      expect(response.headers.location).toContain(`token=${testToken}`);
     });
   });
 

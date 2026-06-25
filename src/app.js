@@ -4,7 +4,7 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 require('dotenv').config();
 
-// Registrar asociaciones de base de datos
+// Importar asociaciones para registrar modelos y relaciones en Sequelize
 require('./models/associations.js');
 
 // Importamos el hub central de rutas

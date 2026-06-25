@@ -3,7 +3,6 @@ const bcrypt = require('bcrypt');
 
 // --- LEER TODOS ---
 const getAllUserAccounts = async () => {
-    // Sequelize: findAll() reemplaza al "SELECT * FROM"
     return await UserAccount.findAll();
 };
 
@@ -46,8 +45,11 @@ const updateUserAccount = async (id, userData) => {
 
     if (updatedRows === 0) return null;
 
-    // Retornamos el registro actualizado buscándolo por su ID
-    return await UserAccount.findByPk(id);
+    return await UserAccount.findByPk(id, {
+        include: [
+            { association: 'role' }
+        ]
+    });
 };
 
 // --- ELIMINAR (DELETE) ---
