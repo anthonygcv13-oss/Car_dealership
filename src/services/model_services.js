@@ -1,4 +1,4 @@
-const { Model, Brand, Vehicle, VehicleImage } = require('../models/associations.js');
+const { Model, Brand, Vehicle, VehicleImage, VehicleVideo } = require('../models/associations.js');
 
 const getAllModels = async () => {
     return await Model.findAll({
@@ -14,6 +14,10 @@ const getAllModels = async () => {
                     {
                         model: VehicleImage,
                         as: 'images'
+                    },
+                    {
+                        model: VehicleVideo,
+                        as: 'videos'
                     }
                 ]
             }

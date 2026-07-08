@@ -1,4 +1,4 @@
-const UserAccount = require('../models/user_account.js'); //
+const { UserAccount } = require('../models/associations.js'); //
 const bcrypt = require('bcrypt'); //
 const jwt = require('jsonwebtoken'); //
 const transporter = require('../config/mailer.js');

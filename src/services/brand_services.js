@@ -1,7 +1,10 @@
 const Brand = require('../models/brand.js');
+const BrandImage = require('../models/brand_image.js');
 
 const getAllBrands = async () => {
-    return await Brand.findAll();
+    return await Brand.findAll({
+        include: [{ model: BrandImage, as: 'images' }]
+    });
 };
 
 const createBrand = async (brandData) => {

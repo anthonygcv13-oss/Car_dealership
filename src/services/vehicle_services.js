@@ -1,9 +1,16 @@
 const Vehicle = require('../models/vehicle.js');
 const Model = require('../models/model.js');
+const VehicleImage = require('../models/vehicle_image.js');
+const VehicleVideo = require('../models/vehicle_video.js');
 const notificationService = require('./notification_services.js');
 
 const getAllVehicles = async () => {
-    return await Vehicle.findAll();
+    return await Vehicle.findAll({
+        include: [
+            { model: VehicleImage, as: 'images' },
+            { model: VehicleVideo, as: 'videos' }
+        ]
+    });
 };
 
 const createVehicle = async (vehicleData) => {

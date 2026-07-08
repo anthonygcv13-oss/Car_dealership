@@ -1,19 +1,28 @@
 const { Sequelize } = require('sequelize');
 require('dotenv').config();
 
-// Determinamos qué URL usar
-const isProduction = process.env.NODE_ENV === 'production';
-const connectionString = isProduction 
-  ? process.env.DATABASE_URL_NEON 
-  : process.env.DATABASE_URL_LOCAL;
+const resolveDatabaseConnectionString = () => {
+  const localUrl = process.env.DATABASE_URL_LOCAL;
+  const neonUrl = process.env.DATABASE_URL_NEON;
+  const useLocal = process.env.USE_LOCAL_DB === 'true' || process.env.NODE_ENV !== 'production' || process.env.LOCAL_DEV === 'true';
+
+  if (useLocal && localUrl) {
+    return localUrl;
+  }
+
+  return neonUrl || localUrl;
+};
+
+const connectionString = resolveDatabaseConnectionString();
+const useNeonDb = process.env.NODE_ENV === 'production' && process.env.USE_LOCAL_DB !== 'true' && process.env.LOCAL_DEV !== 'true';
 
 const sequelize = new Sequelize(connectionString, {
   dialect: 'postgres',
-  logging: false, 
+  logging: false,
   dialectOptions: {
-    ssl: isProduction ? {
+    ssl: useNeonDb ? {
       require: true,
-      rejectUnauthorized: false 
+      rejectUnauthorized: false
     } : false
   },
   pool: {
@@ -25,3 +34,4 @@ const sequelize = new Sequelize(connectionString, {
 });
 
 module.exports = sequelize;
+module.exports.resolveDatabaseConnectionString = resolveDatabaseConnectionString;

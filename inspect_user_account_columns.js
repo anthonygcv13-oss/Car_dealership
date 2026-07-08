@@ -3,7 +3,7 @@ require('dotenv').config();
 
 (async () => {
   const client = new Client({
-    connectionString: process.env.DATABASE_URL_LOCAL
+    connectionString: process.env.DATABASE_URL_NEON
   });
   try {
     await client.connect();

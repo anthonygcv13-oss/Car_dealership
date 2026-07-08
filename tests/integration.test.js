@@ -131,6 +131,7 @@ describe('Pruebas de Integración - API Car Dealership', () => {
   beforeAll(async () => {
     const Notification = require('../src/models/notification.js');
     await Notification.sync();
+    await sequelize.sync(); // Sync all models to guarantee local database schemas are up-to-date
   });
 
   // Limpieza final de la base de datos tras ejecutar todas las pruebas
@@ -240,12 +241,12 @@ describe('Pruebas de Integración - API Car Dealership', () => {
       createdBrandIds.push(testBrandId);
     });
 
-    test('GET /api/models - Sin Token - Debe retornar 401', async () => {
+    test('GET /api/models - Sin Token - Debe retornar 200 (Acceso Público)', async () => {
       const response = await request(app)
         .get('/api/models')
-        .expect(401);
+        .expect(200);
 
-      expect(response.body.success).toBe(false);
+      expect(response.body.success).toBe(true);
     });
 
     test('GET /api/models - Con Token Válido - Debe retornar lista de modelos y coincidir con el esquema Zod', async () => {
@@ -314,13 +315,28 @@ describe('Pruebas de Integración - API Car Dealership', () => {
       expect(validation.success).toBe(true);
     });
 
-    test('POST /api/customers - Sin Token - Debe retornar 401', async () => {
+    test('POST /api/customers - Sin Token - Debe permitir crear cliente (Público) y retornar 201', async () => {
+      const publicCustomerData = {
+        first_name: 'Public Guest',
+        last_name: 'Test',
+        document: `CLI-PUB-${Math.floor(100000 + Math.random() * 900000)}`,
+        phone: '555-123456',
+        email: 'public.guest.test@test.com',
+        address: 'Public Web Registration'
+      };
+
       const response = await request(app)
         .post('/api/customers')
-        .send({ first_name: 'Test' })
-        .expect(401);
+        .send(publicCustomerData)
+        .expect(201);
 
-      expect(response.body.success).toBe(false);
+      expect(response.body.success).toBe(true);
+      const validation = detailResponseSchema(customerSchema).safeParse(response.body);
+      expect(validation.success).toBe(true);
+
+      if (response.body.data && response.body.data.id_customer) {
+        createdCustomerIds.push(response.body.data.id_customer);
+      }
     });
 
     test('POST /api/customers - Con Token Válido - Debe crear un nuevo cliente y coincidir con el esquema Zod', async () => {
@@ -462,12 +478,12 @@ describe('Pruebas de Integración - API Car Dealership', () => {
   // ----------------------------------------------------
   describe('Endpoints de Planes de Financiamiento (/api/financing-plans)', () => {
     
-    test('GET /api/financing-plans - Sin Token - Debe retornar 401', async () => {
+    test('GET /api/financing-plans - Sin Token - Debe retornar 200 (Acceso Público)', async () => {
       const response = await request(app)
         .get('/api/financing-plans')
-        .expect(401);
+        .expect(200);
 
-      expect(response.body.success).toBe(false);
+      expect(response.body.success).toBe(true);
     });
 
     test('GET /api/financing-plans - Con Token Válido - Debe retornar lista de planes y coincidir con el esquema Zod', async () => {

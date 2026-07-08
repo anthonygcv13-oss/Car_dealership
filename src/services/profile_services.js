@@ -1,4 +1,4 @@
-const UserAccount = require('../models/user_account.js');
+const { UserAccount } = require('../models/associations.js');
 const bcrypt = require('bcrypt');
 
 const getProfile = async (userId) => {

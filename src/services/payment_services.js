@@ -1,5 +1,8 @@
 const Payment = require('../models/payment.js');
 const notificationService = require('./notification_services.js');
+const Installment = require('../models/installment.js');
+const VehicleSale = require('../models/vehicle_sale.js');
+const sequelize = require('../config/db.js');
 
 const getAllPayments = async () => {
     return await Payment.findAll();
@@ -7,13 +10,43 @@ const getAllPayments = async () => {
 
 const createPayment = async (paymentData) => {
     const { date, amount, payment_method, id_user, id_vehicle_sale, id_installment } = paymentData;
-    const newPayment = await Payment.create({
-        date,
-        amount,
-        payment_method,
-        id_user,
-        id_vehicle_sale,
-        id_installment
+
+    const result = await sequelize.transaction(async (transaction) => {
+        const newPayment = await Payment.create({
+            date,
+            amount,
+            payment_method,
+            id_user,
+            id_vehicle_sale,
+            id_installment
+        }, { transaction });
+
+        // Si se paga una cuota específica, la marcamos como pagada
+        if (id_installment) {
+            await Installment.update(
+                { status: 'paid' },
+                { where: { id_installment }, transaction }
+            );
+
+            // Contar cuántas cuotas pendientes quedan para esta venta
+            const pendingCount = await Installment.count({
+                where: {
+                    id_vehicle_sale,
+                    status: 'pending'
+                },
+                transaction
+            });
+
+            // Si todas las cuotas están pagas, la venta pasa a estar completada (paid)
+            if (pendingCount === 0) {
+                await VehicleSale.update(
+                    { status: 'paid' },
+                    { where: { id_vehicle_sale }, transaction }
+                );
+            }
+        }
+
+        return newPayment;
     });
 
     try {
@@ -34,7 +67,7 @@ const createPayment = async (paymentData) => {
         console.error("Error al crear notificación para el pago:", notifErr);
     }
 
-    return newPayment;
+    return result;
 };
 
 const updatePayment = async (id, paymentData) => {

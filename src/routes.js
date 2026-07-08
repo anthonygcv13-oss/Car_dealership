@@ -24,6 +24,8 @@ const auditlogRoutes = require('./routes/audit_log_routes.js');
 const profileRoutes = require('./routes/profile_routes.js');
 const vehicleImageRoutes = require('./routes/vehicle_image_routes.js');
 const notificationRoutes = require('./routes/notification_routes.js');
+const brandImageRoutes = require('./routes/brand_image_routes.js');
+const vehicleVideoRoutes = require('./routes/vehicle_video_routes.js');
 
 // Registramos estas rutas bajo el prefijo '/users'
 // Esto significa que la URL final será /api/users/
@@ -33,6 +35,8 @@ router.use('/auth', authRoutes); // <-- Nueva línea (Prefijo /auth)
 router.use('/vehicles', vehicleRoutes);
 router.use('/vehicle-sale', vehiclesaleRoutes);
 router.use('/vehicle-images', vehicleImageRoutes);
+router.use('/brand-images', brandImageRoutes);
+router.use('/vehicle-videos', vehicleVideoRoutes);
 router.use('/notifications', notificationRoutes);
 
 router.use('/suppliers', supplierRoutes);

@@ -1,12 +1,12 @@
-const vehicleImageServices = require('../services/vehicle_image_services.js');
+const brandImageServices = require('../services/brand_image_services.js');
 const { uploadBufferToCloudinary } = require('../services/cloudinary_service.js');
-const { createVehicleImageSchema, updateVehicleImageSchema } = require('../validations/vehicle_image_validation.js');
+const { createBrandImageSchema, updateBrandImageSchema } = require('../validations/brand_image_validation.js');
 
 const normalizeImagePayload = (body = {}) => {
     const normalized = { ...body };
 
-    if (normalized.id_vehicle !== undefined && normalized.id_vehicle !== null) {
-        normalized.id_vehicle = Number(normalized.id_vehicle);
+    if (normalized.id_brand !== undefined && normalized.id_brand !== null) {
+        normalized.id_brand = Number(normalized.id_brand);
     }
 
     if (normalized.display_order !== undefined && normalized.display_order !== null) {
@@ -22,26 +22,26 @@ const normalizeImagePayload = (body = {}) => {
     return normalized;
 };
 
-const getVehicleImages = async (req, res) => {
+const getBrandImages = async (req, res) => {
     try {
-        const { id_vehicle } = req.query;
+        const { id_brand } = req.query;
         const filters = {};
-        if (id_vehicle) {
-            filters.id_vehicle = parseInt(id_vehicle, 10);
+        if (id_brand) {
+            filters.id_brand = parseInt(id_brand, 10);
         }
-        const data = await vehicleImageServices.getAllVehicleImages(filters);
+        const data = await brandImageServices.getAllBrandImages(filters);
         res.json({ success: true, data });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }
 };
 
-const getVehicleImage = async (req, res) => {
+const getBrandImage = async (req, res) => {
     try {
         const { id } = req.params;
-        const data = await vehicleImageServices.getVehicleImageById(id);
+        const data = await brandImageServices.getBrandImageById(id);
         if (!data) {
-            return res.status(404).json({ success: false, message: "Imagen de vehículo no encontrada" });
+            return res.status(404).json({ success: false, message: "Imagen de marca no encontrada" });
         }
         res.json({ success: true, data });
     } catch (error) {
@@ -49,20 +49,20 @@ const getVehicleImage = async (req, res) => {
     }
 };
 
-const createVehicleImage = async (req, res) => {
+const createBrandImage = async (req, res) => {
     try {
         const body = normalizeImagePayload(req.body);
         let imagePayload = body;
 
         if (req.file && req.file.buffer) {
-            const uploadedUrl = await uploadBufferToCloudinary(req.file.buffer, 'car-dealership/vehicles');
+            const uploadedUrl = await uploadBufferToCloudinary(req.file.buffer, 'car-dealership/brands');
             imagePayload = {
                 ...body,
                 url: uploadedUrl
             };
         }
 
-        const validation = createVehicleImageSchema.safeParse(imagePayload);
+        const validation = createBrandImageSchema.safeParse(imagePayload);
 
         if (!validation.success) {
             return res.status(400).json({
@@ -75,33 +75,33 @@ const createVehicleImage = async (req, res) => {
             });
         }
 
-        const newImage = await vehicleImageServices.createVehicleImage(validation.data);
+        const newImage = await brandImageServices.createBrandImage(validation.data);
         res.status(201).json({ success: true, data: newImage });
     } catch (error) {
         if (error.name === 'SequelizeForeignKeyConstraintError') {
             return res.status(400).json({ 
                 success: false, 
-                message: "El vehículo especificado no existe o el ID de referencia es inválido" 
+                message: "La marca especificada no existe o el ID de referencia es inválido" 
             });
         }
         res.status(500).json({ success: false, error: error.message });
     }
 };
 
-const updateVehicleImage = async (req, res) => {
+const updateBrandImage = async (req, res) => {
     try {
         const body = normalizeImagePayload(req.body);
         let imagePayload = body;
 
         if (req.file && req.file.buffer) {
-            const uploadedUrl = await uploadBufferToCloudinary(req.file.buffer, 'car-dealership/vehicles');
+            const uploadedUrl = await uploadBufferToCloudinary(req.file.buffer, 'car-dealership/brands');
             imagePayload = {
                 ...body,
                 url: uploadedUrl
             };
         }
 
-        const validation = updateVehicleImageSchema.safeParse(imagePayload);
+        const validation = updateBrandImageSchema.safeParse(imagePayload);
 
         if (!validation.success) {
             return res.status(400).json({
@@ -114,38 +114,38 @@ const updateVehicleImage = async (req, res) => {
             });
         }
 
-        const updated = await vehicleImageServices.updateVehicleImage(req.params.id, validation.data);
+        const updated = await brandImageServices.updateBrandImage(req.params.id, validation.data);
         if (!updated) {
-            return res.status(404).json({ success: false, message: "Imagen de vehículo no encontrada" });
+            return res.status(404).json({ success: false, message: "Imagen de marca no encontrada" });
         }
         res.json({ success: true, data: updated });
     } catch (error) {
         if (error.name === 'SequelizeForeignKeyConstraintError') {
             return res.status(400).json({ 
                 success: false, 
-                message: "El vehículo especificado no existe o el ID de referencia es inválido" 
+                message: "La marca especificada no existe o el ID de referencia es inválido" 
             });
         }
         res.status(500).json({ success: false, error: error.message });
     }
 };
 
-const deleteVehicleImage = async (req, res) => {
+const deleteBrandImage = async (req, res) => {
     try {
-        const deleted = await vehicleImageServices.deleteVehicleImage(req.params.id);
+        const deleted = await brandImageServices.deleteBrandImage(req.params.id);
         if (!deleted) {
-            return res.status(404).json({ success: false, message: "Imagen de vehículo no encontrada" });
+            return res.status(404).json({ success: false, message: "Imagen de marca no encontrada" });
         }
-        res.json({ success: true, message: "Imagen de vehículo eliminada correctamente" });
+        res.json({ success: true, message: "Imagen de marca eliminada correctamente" });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }
 };
 
 module.exports = {
-    getVehicleImages,
-    getVehicleImage,
-    createVehicleImage,
-    updateVehicleImage,
-    deleteVehicleImage
+    getBrandImages,
+    getBrandImage,
+    createBrandImage,
+    updateBrandImage,
+    deleteBrandImage
 };

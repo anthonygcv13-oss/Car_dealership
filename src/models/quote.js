@@ -8,7 +8,9 @@ const Quote = sequelize.define('Quote', {
   validity_date: { type: DataTypes.DATE },
   id_vehicle: { type: DataTypes.INTEGER },
   id_customer: { type: DataTypes.INTEGER },
-  status: { type: DataTypes.STRING }
+  status: { type: DataTypes.STRING, defaultValue: 'pending' },
+  created_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
+  updated_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW }
 }, {
   tableName: 'quote',
   timestamps: false

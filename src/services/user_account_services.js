@@ -1,4 +1,4 @@
-const UserAccount = require('../models/user_account.js'); // Importamos el modelo de Sequelize
+const { UserAccount } = require('../models/associations.js'); // Importamos el modelo de Sequelize
 const bcrypt = require('bcrypt');
 
 // --- LEER TODOS ---
