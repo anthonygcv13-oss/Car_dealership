@@ -1,9 +1,12 @@
+require('dotenv').config();
 const { DataTypes } = require('sequelize');
+const http = require('http');
 const app = require('./app.js');
 const sequelize = require('./config/db.js');
 const { startQuoteScheduler } = require('./services/quote_scheduler.js');
 const { ensureDatabaseConnection } = require('./services/db_healthcheck.js');
-require('dotenv').config();
+const { initSocket } = require('./config/socket.js');
+const { initRedis } = require('./config/redis.js');
 
 async function ensureQuoteTimestampColumns() {
   try {
@@ -39,6 +42,9 @@ const PORT = process.env.PORT || 3000;
 // Sincronizar base de datos y luego arrancar
 async function startServer() {
   try {
+    // Inicializar caché de Redis
+    initRedis();
+
     const health = await ensureDatabaseConnection();
     if (!health.ok) {
       console.error('⚠️ No se pudo conectar a la base de datos:', health.error);
@@ -51,9 +57,12 @@ async function startServer() {
     await sequelize.sync();
     console.log('✅ Todos los modelos de base de datos sincronizados correctamente.');
 
-    app.listen(PORT, () => {
+    const server = http.createServer(app);
+    initSocket(server);
+
+    server.listen(PORT, () => {
       console.log('----------------------------------------------------');
-      console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+      console.log(`🚀 Servidor HTTP y WebSockets corriendo en http://localhost:${PORT}`);
       const modo = process.env.NODE_ENV === 'production' ? 'PRODUCCIÓN (NEON)' : 'DESARROLLO (LOCAL)';
       console.log(`📡 Base de datos activa en modo: ${modo}`);
       console.log('----------------------------------------------------');

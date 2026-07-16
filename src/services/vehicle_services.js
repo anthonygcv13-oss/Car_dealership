@@ -3,14 +3,27 @@ const Model = require('../models/model.js');
 const VehicleImage = require('../models/vehicle_image.js');
 const VehicleVideo = require('../models/vehicle_video.js');
 const notificationService = require('./notification_services.js');
+const cache = require('../config/redis.js');
 
 const getAllVehicles = async () => {
-    return await Vehicle.findAll({
+    // 1. Intentar obtener de la caché Redis
+    const cachedVehicles = await cache.getCache(cache.keys.VEHICLES);
+    if (cachedVehicles) {
+        console.log('⚡ [Caché Redis] Retornando lista de vehículos desde la caché');
+        return cachedVehicles;
+    }
+
+    // 2. Si no hay caché, consultar base de datos
+    const data = await Vehicle.findAll({
         include: [
             { model: VehicleImage, as: 'images' },
             { model: VehicleVideo, as: 'videos' }
         ]
     });
+
+    // 3. Guardar en caché Redis
+    await cache.setCache(cache.keys.VEHICLES, data);
+    return data;
 };
 
 const createVehicle = async (vehicleData) => {
@@ -45,6 +58,10 @@ const createVehicle = async (vehicleData) => {
         console.error("Error al crear notificación para el vehículo:", notifErr);
     }
 
+    // Invalidar cachés relacionadas
+    await cache.deleteCache(cache.keys.VEHICLES);
+    await cache.deleteCache(cache.keys.MODELS);
+
     return newVehicle;
 };
 
@@ -55,7 +72,13 @@ const updateVehicle = async (id, vehicleData) => {
 
     if (updatedRows === 0) return null;
 
-    return await Vehicle.findByPk(id);
+    const updatedVehicle = await Vehicle.findByPk(id);
+
+    // Invalidar cachés relacionadas
+    await cache.deleteCache(cache.keys.VEHICLES);
+    await cache.deleteCache(cache.keys.MODELS);
+
+    return updatedVehicle;
 };
 
 const deleteVehicle = async (id) => {
@@ -66,6 +89,10 @@ const deleteVehicle = async (id) => {
             where: { id_vehicle: id }
         });
     }
+
+    // Invalidar cachés relacionadas
+    await cache.deleteCache(cache.keys.VEHICLES);
+    await cache.deleteCache(cache.keys.MODELS);
     
     return vehicleToDelete;
 };

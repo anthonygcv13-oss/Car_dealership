@@ -1,4 +1,5 @@
 const Notification = require('../models/notification.js');
+const { getIO } = require('../config/socket.js');
 
 const getAllNotifications = async () => {
   return await Notification.findAll({
@@ -7,13 +8,23 @@ const getAllNotifications = async () => {
 };
 
 const createNotification = async (title, message, type = 'info') => {
-  return await Notification.create({
+  const notification = await Notification.create({
     title,
     message,
     type,
     timestamp: new Date(),
     read: false
   });
+
+  try {
+    const io = getIO();
+    io.emit('notification:created', notification);
+    console.log('📡 Notificación emitida vía WebSocket:', notification.id_notification);
+  } catch (err) {
+    console.warn('⚠️ No se pudo emitir la notificación vía socket:', err.message);
+  }
+
+  return notification;
 };
 
 const markAsRead = async (id) => {

@@ -9,12 +9,15 @@ require('./models/associations.js');
 
 // Importamos el hub central de rutas
 const routes = require('./routes.js'); 
+const { generalLimiter } = require('./middleware/rate_limiter.js');
 
 const app = express();
 
 // Middlewares globales
 app.use(helmet());
 app.use(cors());
+
+app.use('/api', generalLimiter);
 
 // Configurar morgan para omitir logs de HMR y favicon para mantener limpia la consola
 app.use(morgan('dev', {

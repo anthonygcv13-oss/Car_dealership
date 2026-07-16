@@ -1,20 +1,40 @@
 const Brand = require('../models/brand.js');
 const BrandImage = require('../models/brand_image.js');
+const cache = require('../config/redis.js');
 
 const getAllBrands = async () => {
-    return await Brand.findAll({
+    // 1. Intentar obtener de la caché Redis
+    const cachedBrands = await cache.getCache(cache.keys.BRANDS);
+    if (cachedBrands) {
+        console.log('⚡ [Caché Redis] Retornando lista de marcas desde la caché');
+        return cachedBrands;
+    }
+
+    // 2. Si no hay caché, consultar base de datos
+    const data = await Brand.findAll({
         include: [{ model: BrandImage, as: 'images' }]
     });
+
+    // 3. Guardar en caché Redis
+    await cache.setCache(cache.keys.BRANDS, data);
+    return data;
 };
 
 const createBrand = async (brandData) => {
     const { name, description, country_origin, website } = brandData;
-    return await Brand.create({
+    const newBrand = await Brand.create({
         name,
         description,
         country_origin,
         website
     });
+
+    // Invalidar cachés relacionadas
+    await cache.deleteCache(cache.keys.BRANDS);
+    await cache.deleteCache(cache.keys.MODELS);
+    await cache.deleteCache(cache.keys.VEHICLES);
+
+    return newBrand;
 };
 
 const updateBrand = async (id, brandData) => {
@@ -24,7 +44,14 @@ const updateBrand = async (id, brandData) => {
 
     if (updatedRows === 0) return null;
 
-    return await Brand.findByPk(id);
+    const updatedBrand = await Brand.findByPk(id);
+
+    // Invalidar cachés relacionadas
+    await cache.deleteCache(cache.keys.BRANDS);
+    await cache.deleteCache(cache.keys.MODELS);
+    await cache.deleteCache(cache.keys.VEHICLES);
+
+    return updatedBrand;
 };
 
 const deleteBrand = async (id) => {
@@ -35,6 +62,11 @@ const deleteBrand = async (id) => {
             where: { id_brand: id }
         });
     }
+
+    // Invalidar cachés relacionadas
+    await cache.deleteCache(cache.keys.BRANDS);
+    await cache.deleteCache(cache.keys.MODELS);
+    await cache.deleteCache(cache.keys.VEHICLES);
     
     return brandToDelete;
 };
